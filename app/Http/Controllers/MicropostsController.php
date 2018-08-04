@@ -14,14 +14,15 @@ class MicropostsController extends Controller
         $data = [];
         if (\Auth::check()) {
             $user = \Auth::user();
-            $microposts = $user->feed_microposts()->orderBy('created_at', 'desc')->paginate(5);
-
-            $data = [
-                'user' => $user,
-                'microposts' => $microposts,
-            ];
+            if( isset($user) ) {
+                $microposts = $user->feed_microposts()->orderBy('created_at', 'desc')->paginate(5);
+    
+                $data = [
+                    'user' => $user,
+                    'microposts' => $microposts,
+                ];
+            }
         }
-        
         return view('welcome', $data);
     }
     
@@ -42,10 +43,13 @@ class MicropostsController extends Controller
     {
         $micropost = \App\Micropost::find($id);
         
-        if (\Auth::id() === $micropost->user_id) {
-            $micropost->delete();
+        if( isset($micropost) ) {
+            if (\Auth::id() === $micropost->user_id) {
+                $micropost->delete();
+            }
         }
         
         return redirect()->back();
     }
+    
 }
